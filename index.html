@@ -2,32 +2,79 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Vape Shop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Air Vape Shop</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="age-popup" id="agePopup">
+<div id="agePopup">
+<div class="age-box">
 <h2>Czy masz ukończone 18 lat?</h2>
-<button onclick="enterSite()">TAK</button>
+<p>Strona przeznaczona tylko dla osób pełnoletnich.</p>
+<button onclick="enter()">TAK</button>
 <button>NIE</button>
+</div>
 </div>
 
 <header>
-<h1>VapeShop</h1>
+
+<div class="logo">
+<img src="logo.jpg">
+</div>
+
 <nav>
 <a href="#">Strona główna</a>
 <a href="#">Produkty</a>
 <a href="#">Liquidy</a>
+<a href="#">Jednorazówki</a>
 <a href="#">Kontakt</a>
 </nav>
+
 </header>
 
 <section class="hero">
-<h2>Najlepsze vape w Polsce</h2>
-<p>ElfBar • Chaser • VOZOL</p>
+
+<h1>MY AIR</h1>
+
+<p>Najlepszy vape shop w kosmicznym stylu</p>
+
+<a class="btn">Zobacz produkty</a>
+
 </section>
+
+<section class="products">
+
+<h2>Popularne produkty</h2>
+
+<div class="grid">
+
+<div class="card">
+<h3>Elf Bar</h3>
+<p>Jednorazowe vape o intensywnym smaku</p>
+</div>
+
+<div class="card">
+<h3>Chaser Black</h3>
+<p>Liquid premium o głębokim aromacie</p>
+</div>
+
+<div class="card">
+<h3>VOZOL</h3>
+<p>Nowoczesne urządzenia vape</p>
+</div>
+
+</div>
+
+</section>
+
+<footer>
+
+<p>© 2026 My Air Vape Shop</p>
+<p>Sprzedaż tylko dla osób powyżej 18 lat</p>
+
+</footer>
 
 <script src="script.js"></script>
 
