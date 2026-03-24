@@ -2,6 +2,10 @@ import { supabase } from "./supabase.js"
 
 document.addEventListener("DOMContentLoaded", () => {
 
+  /* ---------------- STATE ---------------- */
+
+  let isAdmin = false
+
   /* ---------------- ELEMENTS ---------------- */
 
   const authForm = document.getElementById("authForm")
@@ -48,7 +52,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("agePopup").style.display = "none"
   }
 
-  /* ---------------- UI UPDATE ---------------- */
+  /* ---------------- CHECK ADMIN ---------------- */
+
+  async function checkAdmin(user) {
+    if (!user) return false
+
+    const { data } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single()
+
+    return data?.role === "admin"
+  }
+
+  /* ---------------- UI ---------------- */
 
   async function updateUI() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -58,16 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
       userPanel.classList.remove("hidden")
       userEmail.innerText = user.email
 
+      isAdmin = await checkAdmin(user)
+
       if (authNav) authNav.innerText = "Logout"
 
-      // 👑 админ
-      const { data } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single()
-
-      if (data?.role === "admin") {
+      if (isAdmin) {
         userEmail.innerText += " 👑 ADMIN"
         adminPanel?.classList.remove("hidden")
       }
@@ -108,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* ---------------- PRODUCTS ---------------- */
+  /* ---------------- LOAD PRODUCTS ---------------- */
 
   async function loadProducts() {
     const { data, error } = await supabase
@@ -123,11 +136,19 @@ document.addEventListener("DOMContentLoaded", () => {
     container.innerHTML = ""
 
     data.forEach(product => {
+
       container.innerHTML += `
         <div class="card">
           <img src="${product.image}" />
           <h3>${product.name}</h3>
           <p>${product.price} zł</p>
+
+          ${isAdmin ? `
+            <div class="admin-actions">
+              <button onclick="deleteProduct('${product.id}')">🗑</button>
+              <button onclick="editProduct('${product.id}')">✏️</button>
+            </div>
+          ` : ""}
         </div>
       `
     })
@@ -154,5 +175,43 @@ document.addEventListener("DOMContentLoaded", () => {
       loadProducts()
     }
   })
+
+  /* ---------------- DELETE PRODUCT ---------------- */
+
+  window.deleteProduct = async (id) => {
+
+    if (!confirm("Usunąć produkt?")) return
+
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", id)
+
+    if (error) alert(error.message)
+    else loadProducts()
+  }
+
+  /* ---------------- EDIT PRODUCT ---------------- */
+
+  window.editProduct = async (id) => {
+
+    const newName = prompt("Nowa nazwa:")
+    const newPrice = prompt("Nowa cena:")
+    const newImage = prompt("Nowy URL obrazka:")
+
+    if (!newName || !newPrice) return
+
+    const { error } = await supabase
+      .from("products")
+      .update({
+        name: newName,
+        price: newPrice,
+        image: newImage
+      })
+      .eq("id", id)
+
+    if (error) alert(error.message)
+    else loadProducts()
+  }
 
 })
