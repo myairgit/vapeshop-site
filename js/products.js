@@ -1,28 +1,52 @@
 import { supabase } from "./supabase.js"
 
-const container = document.getElementById("products")
+const params = new URLSearchParams(window.location.search)
+const id = params.get("id")
 
-async function loadProducts() {
-  const { data, error } = await supabase
+const nameEl = document.getElementById("name")
+const imageEl = document.getElementById("image")
+const flavorEl = document.getElementById("flavor")
+
+let product = null
+
+async function loadProduct() {
+  const { data } = await supabase
     .from("products")
     .select("*")
+    .eq("id", id)
+    .single()
 
-  if (error) {
-    console.error(error)
-    return
+  product = data
+
+  nameEl.innerText = data.name
+  imageEl.src = data.image
+
+  // вкусы
+  if (data.flavors) {
+    data.flavors.split(",").forEach(f => {
+      flavorEl.innerHTML += `<option>${f.trim()}</option>`
+    })
   }
-
-  container.innerHTML = ""
-
-  data.forEach(product => {
-    container.innerHTML += `
-      <div class="card">
-        <img src="${product.image}" />
-        <h3>${product.name}</h3>
-        <p>${product.price} zł</p>
-      </div>
-    `
-  })
 }
 
-loadProducts()
+loadProduct()
+
+window.addToCart = () => {
+  const qty = document.getElementById("qty").value
+  const flavor = flavorEl.value
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+  cart.push({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    image: product.image,
+    flavor,
+    qty: Number(qty)
+  })
+
+  localStorage.setItem("cart", JSON.stringify(cart))
+
+  alert("Dodano do koszyka 🛒")
+}

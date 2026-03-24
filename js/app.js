@@ -138,10 +138,10 @@ document.addEventListener("DOMContentLoaded", () => {
     data.forEach(product => {
 
       container.innerHTML += `
-        <div class="card">
-          <img src="${product.image}" />
-          <h3>${product.name}</h3>
-          <p>${product.price} zł</p>
+         <div class="card" onclick="openProduct('${product.id}')">
+    <img src="${product.image}" />
+    <h3>${product.name}</h3>
+    <p>${product.price} zł</p>
 
           ${isAdmin ? `
             <div class="admin-actions">
@@ -215,3 +215,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 })
+
+window.openProduct = (id) => {
+  window.location.href = `product.html?id=${id}`
+}
+
+window.checkout = () => {
+  window.location.href = "checkout.html"
+}
