@@ -4,87 +4,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Air Vape Shop</title>
+
 <link rel="stylesheet" href="style.css">
-<script type="module" src="js/products.js"></script>
+
+<script type="module" src="js/app.js"></script>
 </head>
 
 <body>
 
 <div id="agePopup">
-<div class="age-box">
-<h2>Czy masz ukończone 18 lat?</h2>
-<p>Strona przeznaczona tylko dla osób pełnoletnich.</p>
-<button onclick="enter()">TAK</button>
-<button>NIE</button>
-</div>
+  <div class="age-box">
+    <h2>Czy masz ukończone 18 lat?</h2>
+    <p>Strona przeznaczona tylko dla osób pełnoletnich.</p>
+    <button onclick="enter()">TAK</button>
+    <button>NIE</button>
+  </div>
 </div>
 
 <header>
 
 <div class="logo">
-<img src="logo2.png">
+  <img src="logo2.png">
 </div>
 
 <nav>
-<a href="#">Strona główna</a>
-<a href="#">Produkty</a>
-<a href="#">Liquidy</a>
-<a href="#">Jednorazówki</a>
-<a href="#">Kontakt</a>
+  <a href="#">Strona główna</a>
+  <a href="#">Produkty</a>
+  <a href="#">Liquidy</a>
+  <a href="#">Jednorazówki</a>
+  <a href="#">Kontakt</a>
 </nav>
+
+<!-- 🔥 AUTH UI -->
+<div id="auth">
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button id="signup">Sign Up</button>
+  <button id="signin">Sign In</button>
+  <button id="signout">Logout</button>
+</div>
 
 </header>
 
 <section class="hero">
-
 <h1>MY AIR</h1>
-
 <p>Najlepszy vape shop w kosmicznym stylu</p>
-
 <a class="btn">Zobacz produkty</a>
-
 </section>
-
-<section class="products">
-
-<h2>Popularne produkty</h2>
-
-<div class="grid">
-
-<div class="card">
-<h3>Elf Bar</h3>
-<p>Jednorazowe vape o intensywnym smaku</p>
-</div>
-
-<div class="card">
-<h3>Chaser Black</h3>
-<p>Liquid premium o głębokim aromacie</p>
-</div>
-
-<div class="card">
-<h3>VOZOL</h3>
-<p>Nowoczesne urządzenia vape</p>
-</div>
-
-</div>
-
-</section>
-
-<footer>
-
-<p>© 2026 My Air Vape Shop</p>
-<p>Sprzedaż tylko dla osób powyżej 18 lat</p>
-
-</footer>
-
-<script src="script.js"></script>
-
 
 <section class="products">
 <h2>Produkty</h2>
-
 <div id="products" class="grid"></div>
-
 </section>
+
+<footer>
+<p>© 2026 My Air Vape Shop</p>
+<p>Sprzedaż tylko dla osób powyżej 18 lat</p>
+</footer>
+
 </body>
 </html>
