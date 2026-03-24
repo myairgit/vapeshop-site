@@ -1,4 +1,4 @@
-import { supabase } from "./products.js"
+import { supabase } from "./supabase.js"
 
 const container = document.getElementById("products")
 
