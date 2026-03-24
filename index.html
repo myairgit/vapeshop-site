@@ -38,13 +38,11 @@
 
 </header>
 
-<!-- 🔥 HERO (можно оставить как у тебя было) -->
 <section class="hero">
   <h1>MY AIR</h1>
   <p>Najlepszy vape shop w kosmicznym stylu</p>
 </section>
 
-<!-- 🔥 PRODUCTS -->
 <section class="products">
   <h2>Produkty</h2>
   <div id="products" class="grid"></div>
@@ -56,15 +54,22 @@
 
     <h2>Account</h2>
 
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <!-- 👇 ФОРМА -->
+    <div id="authForm">
+      <input id="email" type="email" placeholder="Email">
+      <input id="password" type="password" placeholder="Password">
 
-    <div class="buttons">
-      <button id="signin">Login</button>
-      <button id="signup">Register</button>
+      <div class="buttons">
+        <button id="signin">Login</button>
+        <button id="signup">Register</button>
+      </div>
     </div>
 
-    <button id="signout" class="logout">Logout</button>
+    <!-- 👇 ПОЛЬЗОВАТЕЛЬ -->
+    <div id="userPanel" class="hidden">
+      <p id="userEmail"></p>
+      <button id="signout" class="logout">Logout</button>
+    </div>
 
     <span class="close" onclick="closeAuth()">✕</span>
 
@@ -76,7 +81,6 @@
 <p>Sprzedaż tylko dla osób powyżej 18 lat</p>
 </footer>
 
-<!-- 🔥 ВАЖНО: скрипт внизу -->
 <script type="module" src="js/app.js"></script>
 
 </body>

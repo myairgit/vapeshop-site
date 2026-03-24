@@ -1,10 +1,8 @@
 import { supabase } from "./supabase.js"
 
-/* ---------------- WAIT FOR DOM ---------------- */
-
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ---------------- AUTH MODAL ---------------- */
+  /* ---------------- MODAL ---------------- */
 
   window.openAuth = () => {
     document.getElementById("authModal").classList.remove("hidden")
@@ -14,13 +12,17 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("authModal").classList.add("hidden")
   }
 
-  /* ---------------- AGE POPUP ---------------- */
+  /* ---------------- AGE ---------------- */
 
   window.enter = () => {
     document.getElementById("agePopup").style.display = "none"
   }
 
-  /* ---------------- AUTH ---------------- */
+  /* ---------------- ELEMENTS ---------------- */
+
+  const authForm = document.getElementById("authForm")
+  const userPanel = document.getElementById("userPanel")
+  const userEmail = document.getElementById("userEmail")
 
   const emailInput = document.getElementById("email")
   const passwordInput = document.getElementById("password")
@@ -29,53 +31,56 @@ document.addEventListener("DOMContentLoaded", () => {
   const signinBtn = document.getElementById("signin")
   const signoutBtn = document.getElementById("signout")
 
-  if (signupBtn) {
-    signupBtn.onclick = async () => {
-      const { error } = await supabase.auth.signUp({
-        email: emailInput.value,
-        password: passwordInput.value
-      })
+  /* ---------------- AUTH UI ---------------- */
 
-      if (error) alert(error.message)
-      else alert("Sprawdź email!")
-    }
-  }
-
-  if (signinBtn) {
-    signinBtn.onclick = async () => {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: emailInput.value,
-        password: passwordInput.value
-      })
-
-      if (error) alert(error.message)
-      else {
-        alert("Zalogowano!")
-        checkUser()
-      }
-    }
-  }
-
-  if (signoutBtn) {
-    signoutBtn.onclick = async () => {
-      await supabase.auth.signOut()
-      alert("Wylogowano")
-    }
-  }
-
-  /* ---------------- CHECK USER ---------------- */
-
-  async function checkUser() {
+  async function updateUI() {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (user) {
-      console.log("Zalogowany:", user.email)
+      authForm.classList.add("hidden")
+      userPanel.classList.remove("hidden")
+      userEmail.innerText = user.email
     } else {
-      console.log("Brak logowania")
+      authForm.classList.remove("hidden")
+      userPanel.classList.add("hidden")
     }
   }
 
-  checkUser()
+  updateUI()
+
+  /* ---------------- SIGN UP ---------------- */
+
+  signupBtn.onclick = async () => {
+    const { error } = await supabase.auth.signUp({
+      email: emailInput.value,
+      password: passwordInput.value
+    })
+
+    if (error) alert(error.message)
+    else alert("Sprawdź email!")
+  }
+
+  /* ---------------- SIGN IN ---------------- */
+
+  signinBtn.onclick = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: emailInput.value,
+      password: passwordInput.value
+    })
+
+    if (error) alert(error.message)
+    else {
+      alert("Zalogowano!")
+      updateUI()
+    }
+  }
+
+  /* ---------------- SIGN OUT ---------------- */
+
+  signoutBtn.onclick = async () => {
+    await supabase.auth.signOut()
+    updateUI()
+  }
 
   /* ---------------- PRODUCTS ---------------- */
 
