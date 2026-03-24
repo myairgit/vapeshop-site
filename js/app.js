@@ -1,90 +1,114 @@
 import { supabase } from "./supabase.js"
 
-window.openAuth = () => {
-  document.getElementById("authModal").classList.remove("hidden")
-}
+/* ---------------- WAIT FOR DOM ---------------- */
 
-window.closeAuth = () => {
-  document.getElementById("authModal").classList.add("hidden")
-}
+document.addEventListener("DOMContentLoaded", () => {
 
-/* ---------------- AGE POPUP ---------------- */
-window.enter = () => {
-  document.getElementById("agePopup").style.display = "none"
-}
+  /* ---------------- AUTH MODAL ---------------- */
 
-/* ---------------- AUTH ---------------- */
-
-const emailInput = document.getElementById("email")
-const passwordInput = document.getElementById("password")
-
-document.getElementById("signup").onclick = async () => {
-  const { error } = await supabase.auth.signUp({
-    email: emailInput.value,
-    password: passwordInput.value
-  })
-
-  if (error) alert(error.message)
-  else alert("Sprawdź email!")
-}
-
-document.getElementById("signin").onclick = async () => {
-  const { error } = await supabase.auth.signInWithPassword({
-    email: emailInput.value,
-    password: passwordInput.value
-  })
-
-  if (error) alert(error.message)
-  else {
-    alert("Zalogowano!")
-    checkUser()
+  window.openAuth = () => {
+    document.getElementById("authModal").classList.remove("hidden")
   }
-}
 
-document.getElementById("signout").onclick = async () => {
-  await supabase.auth.signOut()
-  alert("Wylogowano")
-}
-
-/* ---------------- CHECK USER ---------------- */
-
-async function checkUser() {
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (user) {
-    console.log("Zalogowany:", user.email)
-  } else {
-    console.log("Brak logowania")
+  window.closeAuth = () => {
+    document.getElementById("authModal").classList.add("hidden")
   }
-}
 
-checkUser()
+  /* ---------------- AGE POPUP ---------------- */
 
-/* ---------------- PRODUCTS ---------------- */
+  window.enter = () => {
+    document.getElementById("agePopup").style.display = "none"
+  }
 
-const container = document.getElementById("products")
+  /* ---------------- AUTH ---------------- */
 
-async function loadProducts() {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
+  const emailInput = document.getElementById("email")
+  const passwordInput = document.getElementById("password")
 
-  if (error) {
-    console.error(error)
+  const signupBtn = document.getElementById("signup")
+  const signinBtn = document.getElementById("signin")
+  const signoutBtn = document.getElementById("signout")
+
+  if (signupBtn) {
+    signupBtn.onclick = async () => {
+      const { error } = await supabase.auth.signUp({
+        email: emailInput.value,
+        password: passwordInput.value
+      })
+
+      if (error) alert(error.message)
+      else alert("Sprawdź email!")
+    }
+  }
+
+  if (signinBtn) {
+    signinBtn.onclick = async () => {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: emailInput.value,
+        password: passwordInput.value
+      })
+
+      if (error) alert(error.message)
+      else {
+        alert("Zalogowano!")
+        checkUser()
+      }
+    }
+  }
+
+  if (signoutBtn) {
+    signoutBtn.onclick = async () => {
+      await supabase.auth.signOut()
+      alert("Wylogowano")
+    }
+  }
+
+  /* ---------------- CHECK USER ---------------- */
+
+  async function checkUser() {
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (user) {
+      console.log("Zalogowany:", user.email)
+    } else {
+      console.log("Brak logowania")
+    }
+  }
+
+  checkUser()
+
+  /* ---------------- PRODUCTS ---------------- */
+
+  const container = document.getElementById("products")
+
+  if (!container) {
+    console.error("❌ #products not found in HTML")
     return
   }
 
-  container.innerHTML = ""
+  async function loadProducts() {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
 
-  data.forEach(product => {
-    container.innerHTML += `
-      <div class="card">
-        <img src="${product.image}" />
-        <h3>${product.name}</h3>
-        <p>${product.price} zł</p>
-      </div>
-    `
-  })
-}
+    if (error) {
+      console.error(error)
+      return
+    }
 
-loadProducts()
+    container.innerHTML = ""
+
+    data.forEach(product => {
+      container.innerHTML += `
+        <div class="card">
+          <img src="${product.image}" />
+          <h3>${product.name}</h3>
+          <p>${product.price} zł</p>
+        </div>
+      `
+    })
+  }
+
+  loadProducts()
+
+})
