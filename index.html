@@ -1,158 +1,92 @@
-import { supabase } from "./supabase.js"
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Air Vape Shop</title>
 
-document.addEventListener("DOMContentLoaded", () => {
+<link rel="stylesheet" href="style.css">
+</head>
 
-  /* ---------------- MODAL ---------------- */
+<body>
 
-  window.openAuth = () => {
-    document.getElementById("authModal").classList.remove("hidden")
-  }
+<div id="adminPanel" class="hidden">
+  <h3>Admin Panel</h3>
 
-  window.closeAuth = () => {
-    document.getElementById("authModal").classList.add("hidden")
-  }
+  <input id="productName" placeholder="Nazwa">
+  <input id="productPrice" placeholder="Cena">
+  <input id="productImage" placeholder="Image URL">
 
-  /* ---------------- AGE ---------------- */
+  <button id="addProduct">Dodaj produkt</button>
+</div>
 
-  window.enter = () => {
-    document.getElementById("agePopup").style.display = "none"
-  }
+<div id="agePopup">
+  <div class="age-box">
+    <h2>Czy masz ukończone 18 lat?</h2>
+    <p>Strona przeznaczona tylko dla osób pełnoletnich.</p>
+    <button onclick="enter()">TAK</button>
+    <button>NIE</button>
+  </div>
+</div>
 
-  /* ---------------- ELEMENTS ---------------- */
+<header>
 
-  const authForm = document.getElementById("authForm")
-  const userPanel = document.getElementById("userPanel")
-  const userEmail = document.getElementById("userEmail")
+<div class="logo">
+  <img src="logo2.png">
+</div>
 
-  const adminPanel = document.getElementById("adminPanel")
+<nav>
+  <a href="index.html">Strona główna</a>
+  <a href="products.html">Produkty</a>
+  <a href="contact.html">Kontakt</a>
 
-  const emailInput = document.getElementById("email")
-  const passwordInput = document.getElementById("password")
+  <!-- 🔥 НОВАЯ КНОПКА -->
+  <a href="#" id="authNav" onclick="handleAuth()">Login</a>
+</nav>
 
-  const signupBtn = document.getElementById("signup")
-  const signinBtn = document.getElementById("signin")
-  const signoutBtn = document.getElementById("signout")
+</header>
 
-  const container = document.getElementById("products")
+<section class="hero">
+  <h1>MY AIR</h1>
+  <p>Najlepszy vape shop w kosmicznym stylu</p>
+</section>
 
-  if (!container) {
-    console.error("❌ #products not found in HTML")
-    return
-  }
+<section class="products">
+  <h2>Produkty</h2>
+  <div id="products" class="grid"></div>
+</section>
 
-  /* ---------------- AUTH UI ---------------- */
+<!-- 🔐 AUTH MODAL -->
+<div id="authModal" class="modal hidden">
+  <div class="modal-box">
 
-  async function updateUI() {
-    const { data: { user } } = await supabase.auth.getUser()
+    <h2>Account</h2>
 
-    if (user) {
-      authForm.classList.add("hidden")
-      userPanel.classList.remove("hidden")
-      userEmail.innerText = user.email
+    <div id="authForm">
+      <input id="email" type="email" placeholder="Email">
+      <input id="password" type="password" placeholder="Password">
 
-      // 👑 проверка роли админа
-      const { data } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single()
+      <div class="buttons">
+        <button id="signin">Login</button>
+        <button id="signup">Register</button>
+      </div>
+    </div>
 
-      if (data?.role === "admin") {
-        userEmail.innerText += " 👑 ADMIN"
-        if (adminPanel) adminPanel.classList.remove("hidden")
-      }
+    <div id="userPanel" class="hidden">
+      <p id="userEmail"></p>
+    </div>
 
-    } else {
-      authForm.classList.remove("hidden")
-      userPanel.classList.add("hidden")
-      if (adminPanel) adminPanel.classList.add("hidden")
-    }
-  }
+    <span class="close" onclick="closeAuth()">✕</span>
 
-  updateUI()
+  </div>
+</div>
 
-  /* ---------------- SIGN UP ---------------- */
+<footer>
+<p>© 2026 My Air Vape Shop</p>
+<p>Sprzedaż tylko dla osób powyżej 18 lat</p>
+</footer>
 
-  signupBtn.onclick = async () => {
-    const { error } = await supabase.auth.signUp({
-      email: emailInput.value,
-      password: passwordInput.value
-    })
+<script type="module" src="js/app.js"></script>
 
-    if (error) alert(error.message)
-    else alert("Sprawdź email!")
-  }
-
-  /* ---------------- SIGN IN ---------------- */
-
-  signinBtn.onclick = async () => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: emailInput.value,
-      password: passwordInput.value
-    })
-
-    if (error) alert(error.message)
-    else {
-      alert("Zalogowano!")
-      updateUI()
-    }
-  }
-
-  /* ---------------- SIGN OUT ---------------- */
-
-  signoutBtn.onclick = async () => {
-    await supabase.auth.signOut()
-    updateUI()
-  }
-
-  /* ---------------- LOAD PRODUCTS ---------------- */
-
-  async function loadProducts() {
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-
-    if (error) {
-      console.error(error)
-      return
-    }
-
-    container.innerHTML = ""
-
-    data.forEach(product => {
-      container.innerHTML += `
-        <div class="card">
-          <img src="${product.image}" />
-          <h3>${product.name}</h3>
-          <p>${product.price} zł</p>
-        </div>
-      `
-    })
-  }
-
-  loadProducts()
-
-  /* ---------------- ADD PRODUCT (ADMIN) ---------------- */
-
-  const addBtn = document.getElementById("addProduct")
-
-  if (addBtn) {
-    addBtn.onclick = async () => {
-      const name = document.getElementById("productName").value
-      const price = document.getElementById("productPrice").value
-      const image = document.getElementById("productImage").value
-
-      const { error } = await supabase
-        .from("products")
-        .insert([{ name, price, image }])
-
-      if (error) {
-        alert(error.message)
-      } else {
-        alert("Produkt dodany")
-        loadProducts()
-      }
-    }
-  }
-
-})
+</body>
+</html>
