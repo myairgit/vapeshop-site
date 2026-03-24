@@ -1,5 +1,13 @@
 import { supabase } from "./supabase.js"
 
+window.openAuth = () => {
+  document.getElementById("authModal").classList.remove("hidden")
+}
+
+window.closeAuth = () => {
+  document.getElementById("authModal").classList.add("hidden")
+}
+
 /* ---------------- AGE POPUP ---------------- */
 window.enter = () => {
   document.getElementById("agePopup").style.display = "none"

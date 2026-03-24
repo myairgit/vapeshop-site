@@ -35,28 +35,29 @@
   <a href="#">Kontakt</a>
 </nav>
 
-<!-- 🔥 AUTH UI -->
-<div id="auth">
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
+<!-- 🔐 AUTH BUTTON -->
+<div class="auth-btn" onclick="openAuth()">Login</div>
 
-  <button id="signup">Sign Up</button>
-  <button id="signin">Sign In</button>
-  <button id="signout">Logout</button>
+<!-- 🔐 AUTH MODAL -->
+<div id="authModal" class="modal hidden">
+  <div class="modal-box">
+
+    <h2>Account</h2>
+
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <div class="buttons">
+      <button id="signin">Login</button>
+      <button id="signup">Register</button>
+    </div>
+
+    <button id="signout" class="logout">Logout</button>
+
+    <span class="close" onclick="closeAuth()">✕</span>
+
+  </div>
 </div>
-
-</header>
-
-<section class="hero">
-<h1>MY AIR</h1>
-<p>Najlepszy vape shop w kosmicznym stylu</p>
-<a class="btn">Zobacz produkty</a>
-</section>
-
-<section class="products">
-<h2>Produkty</h2>
-<div id="products" class="grid"></div>
-</section>
 
 <footer>
 <p>© 2026 My Air Vape Shop</p>
