@@ -24,12 +24,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const userPanel = document.getElementById("userPanel")
   const userEmail = document.getElementById("userEmail")
 
+  const adminPanel = document.getElementById("adminPanel")
+
   const emailInput = document.getElementById("email")
   const passwordInput = document.getElementById("password")
 
   const signupBtn = document.getElementById("signup")
   const signinBtn = document.getElementById("signin")
   const signoutBtn = document.getElementById("signout")
+
+  const container = document.getElementById("products")
+
+  if (!container) {
+    console.error("❌ #products not found in HTML")
+    return
+  }
 
   /* ---------------- AUTH UI ---------------- */
 
@@ -40,9 +49,23 @@ document.addEventListener("DOMContentLoaded", () => {
       authForm.classList.add("hidden")
       userPanel.classList.remove("hidden")
       userEmail.innerText = user.email
+
+      // 👑 проверка роли админа
+      const { data } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single()
+
+      if (data?.role === "admin") {
+        userEmail.innerText += " 👑 ADMIN"
+        if (adminPanel) adminPanel.classList.remove("hidden")
+      }
+
     } else {
       authForm.classList.remove("hidden")
       userPanel.classList.add("hidden")
+      if (adminPanel) adminPanel.classList.add("hidden")
     }
   }
 
@@ -82,14 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUI()
   }
 
-  /* ---------------- PRODUCTS ---------------- */
-
-  const container = document.getElementById("products")
-
-  if (!container) {
-    console.error("❌ #products not found in HTML")
-    return
-  }
+  /* ---------------- LOAD PRODUCTS ---------------- */
 
   async function loadProducts() {
     const { data, error } = await supabase
@@ -115,5 +131,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   loadProducts()
+
+  /* ---------------- ADD PRODUCT (ADMIN) ---------------- */
+
+  const addBtn = document.getElementById("addProduct")
+
+  if (addBtn) {
+    addBtn.onclick = async () => {
+      const name = document.getElementById("productName").value
+      const price = document.getElementById("productPrice").value
+      const image = document.getElementById("productImage").value
+
+      const { error } = await supabase
+        .from("products")
+        .insert([{ name, price, image }])
+
+      if (error) {
+        alert(error.message)
+      } else {
+        alert("Produkt dodany")
+        loadProducts()
+      }
+    }
+  }
 
 })

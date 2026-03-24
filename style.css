@@ -200,3 +200,8 @@ cursor:pointer;
 .hidden {
   display: none;
 }
+
+.logo img {
+  height: 60px;   /* уменьшаем */
+  width: auto;
+}
