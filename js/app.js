@@ -223,3 +223,104 @@ window.openProduct = (id) => {
 window.checkout = () => {
   window.location.href = "checkout.html"
 }
+
+const canvas = document.getElementById("smokeCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let mouse = { x: null, y: null };
+
+window.addEventListener("mousemove", (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+class Smoke {
+  constructor() {
+    this.reset();
+  }
+
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 8 + 3;
+    this.speedX = (Math.random() - 0.5) * 0.2;
+    this.speedY = (Math.random() - 0.5) * 0.2;
+    this.alpha = Math.random() * 0.15 + 0.03;
+  }
+
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    // лёгкое отталкивание от курсора
+    if (mouse.x && mouse.y) {
+      let dx = this.x - mouse.x;
+      let dy = this.y - mouse.y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 140) {
+        this.x += dx / dist * 1.5;
+        this.y += dy / dist * 1.5;
+      }
+    }
+
+    if (
+      this.x < -50 ||
+      this.x > canvas.width + 50 ||
+      this.y < -50 ||
+      this.y > canvas.height + 50
+    ) {
+      this.reset();
+    }
+  }
+
+  draw() {
+    const gradient = ctx.createRadialGradient(
+      this.x,
+      this.y,
+      0,
+      this.x,
+      this.y,
+      this.size * 6
+    );
+
+    gradient.addColorStop(0, `rgba(255,255,255,${this.alpha})`);
+    gradient.addColorStop(1, "transparent");
+
+    ctx.beginPath();
+    ctx.fillStyle = gradient;
+    ctx.arc(this.x, this.y, this.size * 6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+let smokeArray = [];
+
+function init() {
+  for (let i = 0; i < 50; i++) {
+    smokeArray.push(new Smoke());
+  }
+}
+
+function animate() {
+  ctx.fillStyle = "rgba(0,0,0,0.12)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  smokeArray.forEach(s => {
+    s.update();
+    s.draw();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+init();
+animate();
+
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
