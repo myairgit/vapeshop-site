@@ -5,42 +5,50 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let mouse = { x: null, y: null };
+
 window.addEventListener("mousemove", (e) => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
 });
 
-class VapeSmoke {
+class Cloud {
   constructor() {
     this.reset();
   }
 
   reset() {
     this.x = Math.random() * canvas.width;
-    this.y = canvas.height + Math.random() * 50; // старт снизу
-    this.size = Math.random() * 10 + 8;
-    this.speedY = Math.random() * 0.3 + 0.2; // поднимается вверх
-    this.speedX = (Math.random() - 0.5) * 0.2; // лёгкое колебание
-    this.alpha = Math.random() * 0.1 + 0.05;
+    this.y = Math.random() * canvas.height;
+
+    this.size = Math.random() * 300 + 200; // ОГРОМНЫЕ облака
+    this.speedX = (Math.random() - 0.5) * 0.2;
+    this.speedY = (Math.random() - 0.5) * 0.1;
+
+    this.alpha = Math.random() * 0.05 + 0.02;
   }
 
   update() {
-    this.y -= this.speedY;
     this.x += this.speedX;
+    this.y += this.speedY;
 
-    // отталкивание от мышки
+    // лёгкое “плавание” от мышки
     if (mouse.x && mouse.y) {
       let dx = this.x - mouse.x;
       let dy = this.y - mouse.y;
       let dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 100) {
-        this.x += dx / dist * 0.8;
-        this.y += dy / dist * 0.8;
+
+      if (dist < 200) {
+        this.x += dx / dist * 0.3;
+        this.y += dy / dist * 0.3;
       }
     }
 
-    // ресет когда улетает вверх
-    if (this.y < -50 || this.x < -50 || this.x > canvas.width + 50) {
+    if (
+      this.x < -400 ||
+      this.x > canvas.width + 400 ||
+      this.y < -400 ||
+      this.y > canvas.height + 400
+    ) {
       this.reset();
     }
   }
@@ -52,28 +60,33 @@ class VapeSmoke {
       0,
       this.x,
       this.y,
-      this.size * 4
+      this.size
     );
-    grad.addColorStop(0, `rgba(200,200,200,${this.alpha})`);
+
+    grad.addColorStop(0, `rgba(180,180,180,${this.alpha})`);
+    grad.addColorStop(0.5, `rgba(120,120,120,${this.alpha * 0.5})`);
     grad.addColorStop(1, "transparent");
 
-    ctx.beginPath();
     ctx.fillStyle = grad;
-    ctx.arc(this.x, this.y, this.size * 4, 0, Math.PI * 2);
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
   }
 }
 
-let smokeArray = [];
-for (let i = 0; i < 40; i++) smokeArray.push(new VapeSmoke());
+let clouds = [];
+for (let i = 0; i < 6; i++) {
+  clouds.push(new Cloud());
+}
 
 function animate() {
-  ctx.fillStyle = "rgba(0,0,0,0.12)";
+  // НЕ ЧИСТЫЙ ФОН — чтобы был "накуренный воздух"
+  ctx.fillStyle = "rgba(10,10,15,0.08)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  smokeArray.forEach((s) => {
-    s.update();
-    s.draw();
+  clouds.forEach(c => {
+    c.update();
+    c.draw();
   });
 
   requestAnimationFrame(animate);
