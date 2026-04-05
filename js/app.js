@@ -223,17 +223,3 @@ window.openProduct = (id) => {
 window.checkout = () => {
   window.location.href = "checkout.html"
 }
-
-const canvas = document.getElementById("smokeCanvas");
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let mouse = { x: null, y: null };
-
-window.addEventListener("mousemove", (e) => {
-  mouse.x = e.clientX;
-  mouse.y = e.clientY;
-});
-

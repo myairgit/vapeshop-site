@@ -357,3 +357,7 @@ button {
   pointer-events: none;
 }
 
+header, section, footer {
+  position: relative;
+  z-index: 2;
+}
