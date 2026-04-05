@@ -4,83 +4,92 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let mouse = { x: null, y: null };
+let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
 window.addEventListener("mousemove", (e) => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
 });
 
-class SmokeLine {
+class SmokeStream {
   constructor() {
     this.reset();
   }
 
   reset() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
+    // старт снизу как “сигарета”
+    this.x = window.innerWidth * 0.5 + (Math.random() - 0.5) * 30;
+    this.y = window.innerHeight * 0.8;
 
-    this.len = Math.random() * 250 + 150;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = -(Math.random() * 0.6 + 0.3);
+
+    this.size = Math.random() * 25 + 15;
+    this.life = 0;
+    this.maxLife = 200 + Math.random() * 100;
+
+    this.alpha = 0.06 + Math.random() * 0.05;
+
     this.angle = Math.random() * Math.PI * 2;
-
-    this.speed = Math.random() * 0.2 + 0.05;
-    this.alpha = Math.random() * 0.04 + 0.02;
-    this.thickness = Math.random() * 40 + 20;
   }
 
   update() {
-    // лёгкое “плавание дыма”
-    this.x += Math.sin(this.angle) * this.speed;
-    this.y -= this.speed * 0.5;
+    this.life++;
 
-    this.angle += 0.002;
+    // “дым поднимается”
+    this.y += this.vy;
+    this.x += this.vx;
 
-    // реакция на мышку
+    // завихрение (главный эффект сигаретного дыма)
+    this.angle += 0.03;
+    this.x += Math.sin(this.angle) * 0.6;
+
+    // лёгкая реакция на мышь
     if (mouse.x && mouse.y) {
       let dx = this.x - mouse.x;
       let dy = this.y - mouse.y;
       let dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < 180) {
-        this.x += dx / dist * 0.3;
-        this.y += dy / dist * 0.3;
+      if (dist < 150) {
+        this.x += dx / dist * 0.4;
+        this.y += dy / dist * 0.4;
       }
     }
 
-    if (this.y < -300) {
+    if (this.life > this.maxLife || this.y < -50) {
       this.reset();
-      this.y = canvas.height + 100;
     }
   }
 
   draw() {
-    const grad = ctx.createLinearGradient(
+    ctx.beginPath();
+
+    const gradient = ctx.createRadialGradient(
       this.x,
       this.y,
-      this.x + this.len,
-      this.y - this.len
+      0,
+      this.x,
+      this.y,
+      this.size
     );
 
-    grad.addColorStop(0, `rgba(200,200,200,0)`);
-    grad.addColorStop(0.5, `rgba(200,200,200,${this.alpha})`);
-    grad.addColorStop(1, `rgba(200,200,200,0)`);
+    gradient.addColorStop(0, `rgba(200,200,200,${this.alpha})`);
+    gradient.addColorStop(0.4, `rgba(160,160,160,${this.alpha * 0.5})`);
+    gradient.addColorStop(1, "transparent");
 
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = this.thickness;
-    ctx.lineCap = "round";
+    ctx.fillStyle = gradient;
 
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x + this.len, this.y - this.len);
-    ctx.stroke();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 
 let smoke = [];
-for (let i = 0; i < 18; i++) smoke.push(new SmokeLine());
+for (let i = 0; i < 35; i++) smoke.push(new SmokeStream());
 
 function animate() {
-  ctx.fillStyle = "rgba(10,10,15,0.10)";
+  // НЕ полностью очищаем — чтобы оставался шлейф дыма
+  ctx.fillStyle = "rgba(10,10,15,0.08)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   smoke.forEach(s => {
@@ -96,4 +105,4 @@ animate();
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-});
+});ы
