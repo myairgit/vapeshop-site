@@ -11,7 +11,7 @@ window.addEventListener("mousemove", (e) => {
   mouse.y = e.clientY;
 });
 
-class Cloud {
+class SmokeLine {
   constructor() {
     this.reset();
   }
@@ -20,73 +20,72 @@ class Cloud {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
 
-    this.size = Math.random() * 300 + 200; // ОГРОМНЫЕ облака
-    this.speedX = (Math.random() - 0.5) * 0.2;
-    this.speedY = (Math.random() - 0.5) * 0.1;
+    this.len = Math.random() * 250 + 150;
+    this.angle = Math.random() * Math.PI * 2;
 
-    this.alpha = Math.random() * 0.05 + 0.02;
+    this.speed = Math.random() * 0.2 + 0.05;
+    this.alpha = Math.random() * 0.04 + 0.02;
+    this.thickness = Math.random() * 40 + 20;
   }
 
   update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
+    // лёгкое “плавание дыма”
+    this.x += Math.sin(this.angle) * this.speed;
+    this.y -= this.speed * 0.5;
 
-    // лёгкое “плавание” от мышки
+    this.angle += 0.002;
+
+    // реакция на мышку
     if (mouse.x && mouse.y) {
       let dx = this.x - mouse.x;
       let dy = this.y - mouse.y;
       let dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < 200) {
+      if (dist < 180) {
         this.x += dx / dist * 0.3;
         this.y += dy / dist * 0.3;
       }
     }
 
-    if (
-      this.x < -400 ||
-      this.x > canvas.width + 400 ||
-      this.y < -400 ||
-      this.y > canvas.height + 400
-    ) {
+    if (this.y < -300) {
       this.reset();
+      this.y = canvas.height + 100;
     }
   }
 
   draw() {
-    const grad = ctx.createRadialGradient(
+    const grad = ctx.createLinearGradient(
       this.x,
       this.y,
-      0,
-      this.x,
-      this.y,
-      this.size
+      this.x + this.len,
+      this.y - this.len
     );
 
-    grad.addColorStop(0, `rgba(180,180,180,${this.alpha})`);
-    grad.addColorStop(0.5, `rgba(120,120,120,${this.alpha * 0.5})`);
-    grad.addColorStop(1, "transparent");
+    grad.addColorStop(0, `rgba(200,200,200,0)`);
+    grad.addColorStop(0.5, `rgba(200,200,200,${this.alpha})`);
+    grad.addColorStop(1, `rgba(200,200,200,0)`);
 
-    ctx.fillStyle = grad;
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = this.thickness;
+    ctx.lineCap = "round";
+
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x + this.len, this.y - this.len);
+    ctx.stroke();
   }
 }
 
-let clouds = [];
-for (let i = 0; i < 6; i++) {
-  clouds.push(new Cloud());
-}
+let smoke = [];
+for (let i = 0; i < 18; i++) smoke.push(new SmokeLine());
 
 function animate() {
-  // НЕ ЧИСТЫЙ ФОН — чтобы был "накуренный воздух"
-  ctx.fillStyle = "rgba(10,10,15,0.08)";
+  ctx.fillStyle = "rgba(10,10,15,0.10)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  clouds.forEach(c => {
-    c.update();
-    c.draw();
+  smoke.forEach(s => {
+    s.update();
+    s.draw();
   });
 
   requestAnimationFrame(animate);
