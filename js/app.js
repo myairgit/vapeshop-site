@@ -244,36 +244,43 @@ class Smoke {
 
   reset() {
     this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.size = Math.random() * 8 + 3;
-    this.speedX = (Math.random() - 0.5) * 0.2;
-    this.speedY = (Math.random() - 0.5) * 0.2;
-    this.alpha = Math.random() * 0.15 + 0.03;
+    this.y = canvas.height + Math.random() * 100; // старт снизу (ВАЖНО)
+    this.size = Math.random() * 20 + 10;
+
+    this.speedX = (Math.random() - 0.5) * 0.3;
+    this.speedY = -(Math.random() * 0.6 + 0.2); // вверх всегда
+
+    this.alpha = Math.random() * 0.08 + 0.02;
+    this.angle = Math.random() * Math.PI * 2;
+    this.spin = (Math.random() - 0.5) * 0.01;
   }
 
   update() {
-    this.x += this.speedX;
+    this.angle += this.spin;
+
+    // “плавание” как дым
+    this.x += Math.sin(this.angle) * 0.6 + this.speedX;
     this.y += this.speedY;
 
-    // лёгкое отталкивание от курсора
+    // лёгкий ветер
+    this.x += Math.sin(this.y * 0.01) * 0.3;
+
+    // курсор раздвигает дым
     if (mouse.x && mouse.y) {
       let dx = this.x - mouse.x;
       let dy = this.y - mouse.y;
       let dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < 140) {
-        this.x += dx / dist * 1.5;
-        this.y += dy / dist * 1.5;
+      if (dist < 160) {
+        this.x += dx / dist * 1.2;
+        this.y += dy / dist * 1.2;
       }
     }
 
-    if (
-      this.x < -50 ||
-      this.x > canvas.width + 50 ||
-      this.y < -50 ||
-      this.y > canvas.height + 50
-    ) {
-      this.reset();
+    // респавн сверху
+    if (this.y < -50) {
+      this.x = Math.random() * canvas.width;
+      this.y = canvas.height + 50;
     }
   }
 
@@ -284,43 +291,16 @@ class Smoke {
       0,
       this.x,
       this.y,
-      this.size * 6
+      this.size
     );
 
     gradient.addColorStop(0, `rgba(255,255,255,${this.alpha})`);
+    gradient.addColorStop(0.5, `rgba(200,200,200,${this.alpha * 0.5})`);
     gradient.addColorStop(1, "transparent");
 
     ctx.beginPath();
     ctx.fillStyle = gradient;
-    ctx.arc(this.x, this.y, this.size * 6, 0, Math.PI * 2);
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
   }
 }
-
-let smokeArray = [];
-
-function init() {
-  for (let i = 0; i < 50; i++) {
-    smokeArray.push(new Smoke());
-  }
-}
-
-function animate() {
-  ctx.fillStyle = "rgba(0,0,0,0.12)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  smokeArray.forEach(s => {
-    s.update();
-    s.draw();
-  });
-
-  requestAnimationFrame(animate);
-}
-
-init();
-animate();
-
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
