@@ -4,59 +4,28 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-
-window.addEventListener("mousemove", (e) => {
-  mouse.x = e.clientX;
-  mouse.y = e.clientY;
-});
-
-class SmokeStream {
+class SmokeFlow {
   constructor() {
     this.reset();
   }
 
   reset() {
-    // старт снизу как “сигарета”
-    this.x = window.innerWidth * 0.5 + (Math.random() - 0.5) * 30;
-    this.y = window.innerHeight * 0.8;
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height + Math.random() * 100;
 
-    this.vx = (Math.random() - 0.5) * 0.4;
-    this.vy = -(Math.random() * 0.6 + 0.3);
+    this.length = Math.random() * 200 + 150;
+    this.speed = Math.random() * 0.5 + 0.2;
 
-    this.size = Math.random() * 25 + 15;
-    this.life = 0;
-    this.maxLife = 200 + Math.random() * 100;
-
-    this.alpha = 0.06 + Math.random() * 0.05;
-
-    this.angle = Math.random() * Math.PI * 2;
+    this.offset = Math.random() * 1000;
+    this.alpha = Math.random() * 0.08 + 0.03;
+    this.width = Math.random() * 20 + 10;
   }
 
   update() {
-    this.life++;
+    this.y -= this.speed;
+    this.offset += 0.02;
 
-    // “дым поднимается”
-    this.y += this.vy;
-    this.x += this.vx;
-
-    // завихрение (главный эффект сигаретного дыма)
-    this.angle += 0.03;
-    this.x += Math.sin(this.angle) * 0.6;
-
-    // лёгкая реакция на мышь
-    if (mouse.x && mouse.y) {
-      let dx = this.x - mouse.x;
-      let dy = this.y - mouse.y;
-      let dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < 150) {
-        this.x += dx / dist * 0.4;
-        this.y += dy / dist * 0.4;
-      }
-    }
-
-    if (this.life > this.maxLife || this.y < -50) {
+    if (this.y < -200) {
       this.reset();
     }
   }
@@ -64,35 +33,34 @@ class SmokeStream {
   draw() {
     ctx.beginPath();
 
-    const gradient = ctx.createRadialGradient(
-      this.x,
-      this.y,
-      0,
-      this.x,
-      this.y,
-      this.size
-    );
+    for (let i = 0; i < this.length; i++) {
+      let wave = Math.sin((i * 0.05) + this.offset) * 30;
 
-    gradient.addColorStop(0, `rgba(200,200,200,${this.alpha})`);
-    gradient.addColorStop(0.4, `rgba(160,160,160,${this.alpha * 0.5})`);
-    gradient.addColorStop(1, "transparent");
+      let x = this.x + wave;
+      let y = this.y + i;
 
-    ctx.fillStyle = gradient;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
 
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.strokeStyle = `rgba(220,220,220,${this.alpha})`;
+    ctx.lineWidth = this.width;
+    ctx.lineCap = "round";
+
+    ctx.stroke();
   }
 }
 
-let smoke = [];
-for (let i = 0; i < 35; i++) smoke.push(new SmokeStream());
+let smokes = [];
+for (let i = 0; i < 12; i++) {
+  smokes.push(new SmokeFlow());
+}
 
 function animate() {
-  // НЕ полностью очищаем — чтобы оставался шлейф дыма
-  ctx.fillStyle = "rgba(10,10,15,0.08)";
+  ctx.fillStyle = "rgba(10,10,15,0.07)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  smoke.forEach(s => {
+  smokes.forEach(s => {
     s.update();
     s.draw();
   });
@@ -105,4 +73,4 @@ animate();
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-});ы
+});
