@@ -365,3 +365,26 @@ header, section, footer, .modal, .admin-panel {
 html {
   scroll-behavior: smooth;
 }
+
+.contact {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.contact h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.contact-box {
+  background: rgba(255,255,255,0.05);
+  padding: 30px;
+  border-radius: 20px;
+  display: inline-block;
+  backdrop-filter: blur(10px);
+}
+
+.contact-box p {
+  margin: 10px 0;
+  font-size: 18px;
+}

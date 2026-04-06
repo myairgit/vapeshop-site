@@ -1,16 +1,3 @@
-const canvas = document.getElementById("smokeCanvas");
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let mouse = { x: null, y: null };
-
-window.addEventListener("mousemove", (e) => {
-  mouse.x = e.clientX;
-  mouse.y = e.clientY;
-});
-
 class SmokeFlow {
   constructor() {
     this.reset();
@@ -20,78 +7,72 @@ class SmokeFlow {
     this.baseX = Math.random() * canvas.width;
     this.y = canvas.height + Math.random() * 100;
 
-    this.length = Math.random() * 250 + 200;
-    this.speed = Math.random() * 0.4 + 0.2;
+    this.length = 300; // фикс длина = плавнее
+    this.speed = Math.random() * 0.3 + 0.2;
 
     this.offset = Math.random() * 1000;
-    this.alpha = Math.random() * 0.08 + 0.04;
-    this.width = Math.random() * 18 + 8;
+    this.alpha = 0.05;
+    this.width = Math.random() * 12 + 8;
   }
 
   update() {
     this.y -= this.speed;
-    this.offset += 0.02;
+    this.offset += 0.015; // медленнее = плавнее
 
-    if (this.y < -300) this.reset();
+    if (this.y < -400) this.reset();
   }
 
   draw() {
     ctx.beginPath();
 
+    let prevX, prevY;
+
     for (let i = 0; i < this.length; i++) {
-      let wave = Math.sin(i * 0.04 + this.offset) * 25;
+      let t = i / this.length;
+
+      // плавная синусоида (главное!)
+      let wave =
+        Math.sin(i * 0.02 + this.offset) * 40 +
+        Math.sin(i * 0.01 + this.offset * 0.5) * 20;
 
       let x = this.baseX + wave;
       let y = this.y + i;
 
-      // 💥 влияние мышки (раздувает дым)
+      // реакция на мышку (но мягкая!)
       if (mouse.x && mouse.y) {
         let dx = x - mouse.x;
         let dy = y - mouse.y;
         let dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < 150) {
-          x += dx / dist * 15; // сильнее эффект
-          y += dy / dist * 10;
+          let force = (150 - dist) / 150;
+          x += dx * force * 0.2;
+          y += dy * force * 0.2;
         }
       }
 
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        // 🔥 СГЛАЖИВАНИЕ (убирает “червей”)
+        ctx.quadraticCurveTo(prevX, prevY, x, y);
+      }
+
+      prevX = x;
+      prevY = y;
     }
 
-    // 🔥 blur-like эффект (реализм)
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = `rgba(255,255,255,${this.alpha})`;
-
+    // мягкий градиент прозрачности
     ctx.strokeStyle = `rgba(220,220,220,${this.alpha})`;
     ctx.lineWidth = this.width;
     ctx.lineCap = "round";
+
+    // glow
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = "rgba(255,255,255,0.15)";
 
     ctx.stroke();
 
     ctx.shadowBlur = 0;
   }
 }
-
-let smokes = [];
-for (let i = 0; i < 14; i++) smokes.push(new SmokeFlow());
-
-function animate() {
-  // ❌ НЕТ затемнения фона
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  smokes.forEach(s => {
-    s.update();
-    s.draw();
-  });
-
-  requestAnimationFrame(animate);
-}
-
-animate();
-
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
