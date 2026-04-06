@@ -328,7 +328,15 @@ button {
 }
 
 .product-image {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 15px;
   background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .product-image img {
@@ -336,7 +344,8 @@ button {
   max-height: 100%;
   width: auto;
   height: auto;
-  margin: auto;
+  object-fit: contain;
+  transform: none;
   display: block;
 }
 
