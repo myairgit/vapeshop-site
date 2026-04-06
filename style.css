@@ -357,7 +357,6 @@ button {
   pointer-events: none;
 }
 
-/* ВСЁ ПОВЕРХ */
 header, section, footer, .modal, .admin-panel {
   position: relative;
   z-index: 10;
