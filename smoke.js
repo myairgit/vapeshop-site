@@ -11,7 +11,7 @@ window.addEventListener("mousemove", (e) => {
   mouse.y = e.clientY;
 });
 
-class SmokeFlow {
+class Smoke {
   constructor() {
     this.reset();
   }
