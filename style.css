@@ -388,3 +388,12 @@ html {
   margin: 10px 0;
   font-size: 18px;
 }
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
