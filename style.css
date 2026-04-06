@@ -328,23 +328,16 @@ button {
 }
 
 .product-image {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1 / 1; /* квадрат */
-  overflow: hidden;
-  border-radius: 15px;
   background: #1a1a1a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.3s;
 }
 
 .product-image img {
-  width: 100%;
-  transform: scale(1.05);
-  height: 100%;
-  object-fit: cover; /* КЛЮЧ */
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  margin: auto;
+  display: block;
 }
 
 #smokeCanvas {
