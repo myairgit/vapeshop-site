@@ -1,3 +1,11 @@
+const canvas = document.getElementById("smokeCanvas");
+
+if (!canvas) {
+  console.error("Canvas не найден!");
+}
+
+const ctx = canvas.getContext("2d");
+
 class SmokeFlow {
   constructor() {
     this.reset();
